@@ -5,26 +5,30 @@
 #include <string>
 #include <memory>
 #include <stdexcept>
-#include "httpParser.h"
-#include "socket_wrapper.h"
+#include <vector>
+#include <unordered_map>
 
-class Net{
+#include "http_parser.h"
+#include "socket_wrapper.h"
+#include "epoll_wrapper.h"
+
+class net{
 protected:
     socket_wrapper connection;
-    static constexpr int MAX_BUFF = 256;
 public:
     int send_net(socket_wrapper& client_sock, const std::string& buff);
     int recv_net(socket_wrapper& client_sock, std::string& answer);
 };
 
-class Net_client: Net{
+class net_server: public net{
+    static constexpr int MAX_EVENTS = 64;
+    epoll_wrapper epoll_wrap;
+    std::unordered_map<int, socket_wrapper> connections;
 public:
-    Net_client(const std::string server_address);
-};
-
-class Net_server: public Net{
-public:
-    Net_server(const std::string address);
-    int listen_net();
-    int accept_net();
+    net_server(const std::string address);
+    net_server(const net_server&) = delete;
+    net_server& operator=(const net_server&) = delete;
+    std::vector<int> wait_ready();
+    socket_wrapper& get_conn(const int fd);
+    int close_conn(const int fd);
 };

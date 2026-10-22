@@ -6,10 +6,6 @@ CTestTestfile.cmake
 Testing/
 compile_commands.json
 
-# В данный момент не готовы
-epoll_wrapper.h
-epoll_wrapper.cpp
-
 main_client.cpp
 main_server.cpp
 

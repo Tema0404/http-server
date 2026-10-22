@@ -1,7 +1,7 @@
-#include "httpParser.h"
+#include "http_parser.h"
 
 
-int HTTP_parser::parse_address(const std::string& address, 
+int http_parser::parse_address(const std::string& address, 
     std::string& ipv4, std::string& port){
 
     size_t find_colon = address.find(':');
@@ -27,14 +27,15 @@ int HTTP_parser::parse_address(const std::string& address,
     return 0;
 }
 
-void HTTP_parser::parse_request(HTTP_req& req, std::string& buff){
-    std::cout << buff << '\n';
-    int pos_f_space = buff.find(' ');
-    req.method = buff.substr(0, pos_f_space);
+void http_parser::parse_request(HTTP_req& req, const std::string& buff){
+    std::string temp_buff = buff.substr(0, buff.find("\r\n"));
+    std::cout << temp_buff << '\n';
+    size_t pos_f_space = temp_buff.find(' ');
+    req.method = temp_buff.substr(0, pos_f_space);
 
-    int pos_s_space = buff.find(' ', pos_f_space + 1);
-    req.path = buff.substr(pos_f_space + 1, pos_s_space - pos_f_space - 1);
+    size_t pos_s_space = temp_buff.find(' ', pos_f_space + 1);
+    req.path = temp_buff.substr(pos_f_space + 1, pos_s_space - pos_f_space - 1);
 
-    req.protocol = buff.substr(pos_s_space + 1);
+    req.protocol = temp_buff.substr(pos_s_space + 1);
     return;
 }

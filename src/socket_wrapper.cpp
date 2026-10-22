@@ -4,23 +4,20 @@ socket_wrapper::socket_wrapper(int fd): fd(fd) {
     if(fd < 0)
         throw std::runtime_error("incorrect file descryptor");
 }
+
 socket_wrapper::socket_wrapper(int domain, int type, int protocol){
     fd = socket(domain, type, protocol);
     if(fd < 0)
         throw std::runtime_error("incorrect file descryptor");
 }
-socket_wrapper::~socket_wrapper(){
-    if(fd >= 0){
-        shutdown(fd, SHUT_RDWR);
-        close(fd);
-    }
-}
+
 socket_wrapper::socket_wrapper(socket_wrapper&& socket) noexcept{
     if(this == &socket)
         return;
     fd = socket.fd;
     socket.fd = -1;
 }
+
 socket_wrapper& socket_wrapper::operator=(socket_wrapper&& socket) noexcept{
     if(this == &socket)
         return *this;
@@ -30,6 +27,13 @@ socket_wrapper& socket_wrapper::operator=(socket_wrapper&& socket) noexcept{
     fd = socket.fd;
     socket.fd = -1;
     return *this;   
+}
+
+socket_wrapper::~socket_wrapper(){
+    if(fd >= 0){
+        shutdown(fd, SHUT_RDWR);
+        close(fd);
+    }
 }
 
 int socket_wrapper::set_opt(const int level, const int optname, 
@@ -96,6 +100,6 @@ int socket_wrapper::recv_from_socket(std::string& buff,
     return n;
 }
 
-const int socket_wrapper::get_fd() const{
+int socket_wrapper::get_fd() const{
     return fd;
 }
